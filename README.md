@@ -56,7 +56,7 @@ Ensure these are set for `inference.py`:
 
 ### Local Development
 1. `pip install -r requirements.txt`
-2. `python server.py` (Starts FastAPI server on 7860)
+2. `python app.py` (Starts FastAPI server on 7860)
 3. `python inference.py` (Starts agent inference)
 
 ### Docker
