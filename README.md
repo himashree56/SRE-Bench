@@ -1,3 +1,11 @@
+---
+title: SRE Bench
+emoji: 🔥
+colorFrom: blue
+colorTo: red
+sdk: docker
+pinned: false
+---
 # SREBench 🔥 — Train agents to own production incidents
 
 ## Overview
