@@ -25,6 +25,11 @@ app = create_app(
     max_concurrent_envs=MAX_CONCURRENT,
 )
 
+@app.get("/", tags=["Environment Info"])
+async def root():
+    """Health check for Hugging Face Spaces."""
+    return {"status": "ok", "message": "SREBench is running"}
+
 # Custom metadata/tasks endpoint
 @app.get("/tasks", tags=["Environment Info"])
 async def list_tasks():
