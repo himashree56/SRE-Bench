@@ -147,15 +147,28 @@ else
   stop_at "Step 2"
 fi
 
-# ── Step 3: Docker build (Skipped locally) ───────────────────────────────────
-log "${BOLD}Step 3/4: Skipping docker build (Local Docker not found)${NC} ..."
-pass "Docker check skipped (using HF Space build status as source of truth)"
-# if ! command -v docker &>/dev/null; then
-#   fail "docker command not found"
-#   hint "Install Docker Desktop for Windows: https://docs.docker.com/get-docker/"
-#   stop_at "Step 3"
-# fi
-# ... (rest of docker check commented out)
+# ── Step 3: Docker build ───────────────────────────────────
+log "${BOLD}Step 3/4: Testing local Docker build${NC} ..."
+
+if ! command -v docker &>/dev/null; then
+  fail "docker command not found"
+  hint "Install Docker Desktop: https://docs.docker.com/get-docker/"
+  stop_at "Step 3"
+fi
+
+# Test Docker build
+DOCKER_BUILD_OK=false
+DOCKER_BUILD_OUTPUT=$(cd "$REPO_DIR" && run_with_timeout "$DOCKER_BUILD_TIMEOUT" docker build -t sre-bench-test . 2>&1) && DOCKER_BUILD_OK=true
+
+if [ "$DOCKER_BUILD_OK" = true ]; then
+  pass "Docker build succeeded"
+else
+  fail "Docker build failed"
+  printf "%s\n" "$DOCKER_BUILD_OUTPUT"
+  hint "Check Dockerfile syntax and dependencies"
+  hint "Ensure all required files are present"
+  stop_at "Step 3"
+fi
 
 # ── Step 4: openenv validate ──────────────────────────────────────────────────
 log "${BOLD}Step 4/4: Running openenv validate${NC} ..."
@@ -168,7 +181,14 @@ log "${BOLD}Step 4/4: Running openenv validate${NC} ..."
 # fi
 
 VALIDATE_OK=false
-VALIDATE_OUTPUT=$(cd "$REPO_DIR" && venv/Scripts/openenv.exe validate 2>&1) && VALIDATE_OK=true
+# Cross-platform openenv validation
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+  # Windows
+  VALIDATE_OUTPUT=$(cd "$REPO_DIR" && venv/Scripts/openenv.exe validate 2>&1) && VALIDATE_OK=true
+else
+  # Unix-like (macOS, Linux)
+  VALIDATE_OUTPUT=$(cd "$REPO_DIR" && source venv/bin/activate && openenv validate 2>&1) && VALIDATE_OK=true
+fi
 
 if [ "$VALIDATE_OK" = true ]; then
   pass "openenv validate passed"
