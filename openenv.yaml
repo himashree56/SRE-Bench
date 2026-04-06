@@ -1,0 +1,28 @@
+name: sre-bench
+version: "1.0.0"
+description: >
+  Autonomous incident response benchmark for SRE agents.
+  Agents triage alerts, correlate metrics/logs, execute 
+  remediations, and write postmortems in a synthetic 
+  production environment.
+tags: [openenv, aiops, sre, incident-response, rl-benchmark]
+tasks:
+  - id: alert-classifier
+    difficulty: easy
+    max_steps: 8
+    description: "Triage 3 simultaneous alerts and identify the real P1 incident."
+  - id: root-cause-correlator
+    difficulty: medium
+    max_steps: 15
+    description: "Diagnose a bad deploy on db-proxy causing high latency on payment-service and verify the fix."
+  - id: incident-commander
+    difficulty: hard
+    max_steps: 25
+    description: "Full cascading failure - diagnose and resolve a memory leak in auth-service."
+action_space: tool_call
+observation_space: structured_json
+reward_range: [-0.5, 1.0]
+endpoints:
+  reset: POST /reset
+  step:  POST /step
+  state: GET  /state
