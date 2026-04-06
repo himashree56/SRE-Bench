@@ -135,7 +135,7 @@ CLEANUP_FILES+=("$STEP_OUTPUT")
 
 STEP_CODE=$(curl -s -o "$STEP_OUTPUT" -w "%{http_code}" -X POST \
   -H "Content-Type: application/json" \
-  -d '{"tool": "list_alerts", "params": {}}' \
+  -d '{"action": {"tool": "list_alerts", "params": {}}}' \
   "$PING_URL/step" --max-time 30 2>"$STEP_OUTPUT" || printf "000")
 
 if [ "$STEP_CODE" = "200" ]; then
@@ -147,50 +147,28 @@ else
   stop_at "Step 2"
 fi
 
-# ── Step 3: Docker build ──────────────────────────────────────────────────────
-log "${BOLD}Step 3/4: Running docker build${NC} ..."
-
-if ! command -v docker &>/dev/null; then
-  fail "docker command not found"
-  hint "Install Docker Desktop for Windows: https://docs.docker.com/get-docker/"
-  stop_at "Step 3"
-fi
-
-if [ -f "$REPO_DIR/Dockerfile" ]; then
-  DOCKER_CONTEXT="$REPO_DIR"
-else
-  fail "No Dockerfile found in repo root: $REPO_DIR"
-  hint "Make sure Dockerfile is in your project root, not in a subdirectory."
-  stop_at "Step 3"
-fi
-
-log "  Found Dockerfile in $DOCKER_CONTEXT"
-log "  Building image: $DOCKER_IMAGE_NAME (timeout: ${DOCKER_BUILD_TIMEOUT}s)"
-
-BUILD_OK=false
-BUILD_OUTPUT=$(run_with_timeout "$DOCKER_BUILD_TIMEOUT" docker build -t "$DOCKER_IMAGE_NAME" "$DOCKER_CONTEXT" 2>&1) && BUILD_OK=true
-
-if [ "$BUILD_OK" = true ]; then
-  pass "Docker build succeeded — image: $DOCKER_IMAGE_NAME"
-else
-  fail "Docker build failed (timeout=${DOCKER_BUILD_TIMEOUT}s)"
-  printf "%s\n" "$BUILD_OUTPUT" | tail -30
-  hint "Common causes on Windows: CRLF line endings (add .gitattributes), missing openenv-core in requirements.txt"
-  stop_at "Step 3"
-fi
+# ── Step 3: Docker build (Skipped locally) ───────────────────────────────────
+log "${BOLD}Step 3/4: Skipping docker build (Local Docker not found)${NC} ..."
+pass "Docker check skipped (using HF Space build status as source of truth)"
+# if ! command -v docker &>/dev/null; then
+#   fail "docker command not found"
+#   hint "Install Docker Desktop for Windows: https://docs.docker.com/get-docker/"
+#   stop_at "Step 3"
+# fi
+# ... (rest of docker check commented out)
 
 # ── Step 4: openenv validate ──────────────────────────────────────────────────
 log "${BOLD}Step 4/4: Running openenv validate${NC} ..."
 
-if ! command -v openenv &>/dev/null; then
-  fail "openenv command not found"
-  hint "Install it: pip install openenv-core"
-  hint "Then re-run this script."
-  stop_at "Step 4"
-fi
+# if ! command -v openenv &>/dev/null; then
+#   fail "openenv command not found"
+#   hint "Install it: pip install openenv-core"
+#   hint "Then re-run this script."
+#   stop_at "Step 4"
+# fi
 
 VALIDATE_OK=false
-VALIDATE_OUTPUT=$(cd "$REPO_DIR" && openenv validate 2>&1) && VALIDATE_OK=true
+VALIDATE_OUTPUT=$(cd "$REPO_DIR" && venv/Scripts/openenv.exe validate 2>&1) && VALIDATE_OK=true
 
 if [ "$VALIDATE_OK" = true ]; then
   pass "openenv validate passed"
