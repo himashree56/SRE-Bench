@@ -95,7 +95,8 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
         **kwargs: Any,
     ) -> SREObservation:
         """Execute one tool call and return the observation (with reward/done)."""
-        assert self.observation is not None, "Call reset() before step()"
+        if self.observation is None:
+            self.reset()
 
         if self._done:
             self.observation.done = True
