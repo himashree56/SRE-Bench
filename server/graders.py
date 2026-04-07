@@ -1,5 +1,7 @@
 from typing import List, Dict, Any, Optional
 
+from server.scoring import clamp_task_score
+
 class BaseGrader:
     def score(self, history: List[Dict[str, Any]], ground_truth: Dict[str, Any], episode_state: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError
@@ -25,7 +27,7 @@ class TaskEasyGrader(BaseGrader):
         
         outcome = "Correct diagnosis" if diagnosis_score >= 0.4 else "Failed to identify root cause"
         return {
-            "value": float(min(0.999, max(0.001, total))),
+            "value": clamp_task_score(total),
             "breakdown": {"diagnosis": diagnosis_score, "speed": speed_bonus, "postmortem_penalty": postmortem_penalty},
             "reason": f"{outcome}: Identified {ground_truth['root_cause_service']} ({diagnosis_score:.1f})."
         }
@@ -59,7 +61,7 @@ class TaskMediumGrader(BaseGrader):
         
         total = rollback_score + commit_score + hypothesis_score + efficiency - penalty
         return {
-            "value": float(min(0.999, max(0.001, total))),
+            "value": clamp_task_score(total),
             "breakdown": {
                 "rollback": rollback_score, 
                 "commit": commit_score, 
@@ -111,7 +113,7 @@ class TaskHardGrader(BaseGrader):
                  blast_radius_bonus + time_bonus - destructive_penalty)
                  
         return {
-            "value": float(min(0.999, max(0.001, total))),
+            "value": clamp_task_score(total),
             "breakdown": {
                 "root_service": root_service_score, 
                 "action": action_score, 

@@ -7,6 +7,7 @@ from openenv.core.env_server.interfaces import Environment
 from server.models import SREObservation, SREAction, SREReward, SREState
 from server.simulator import SyntheticIncidentSimulator
 from server.graders import TaskEasyGrader, TaskMediumGrader, TaskHardGrader
+from server.scoring import clamp_task_score
 from server.tasks.task_easy import get_easy_task
 from server.tasks.task_medium import get_medium_task
 from server.tasks.task_hard import get_hard_task
@@ -100,7 +101,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
 
         if self._done:
             self.observation.done = True
-            self.observation.reward = 0.01
+            self.observation.reward = clamp_task_score(0.01)
             return self.observation
 
         self.observation.step += 1
@@ -122,7 +123,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
         self.history.append({
             "step": self.observation.step,
             "action": action.model_dump(exclude={"metadata"}),
-            "reward": 0.01,  # Placeholder, updated below if needed
+            "reward": clamp_task_score(0.01),  # Placeholder, updated below if needed
             "observation": self.observation.model_copy(deep=True),
         })
 
@@ -313,7 +314,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
             step_reward += grade_res["value"]
             breakdown.update(grade_res["breakdown"])
             return SREReward(
-                value=max(0.001, min(0.999, step_reward)),
+                value=clamp_task_score(step_reward),
                 breakdown=breakdown,
                 reason=grade_res["reason"],
             )
@@ -355,7 +356,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
                 step_reward -= 0.30
                 breakdown["destructive_penalty"] = -0.30
 
-        return SREReward(value=max(0.001, min(0.999, step_reward)), breakdown=breakdown)
+        return SREReward(value=clamp_task_score(step_reward), breakdown=breakdown)
 
     def _get_grader(self):
         sc = self.task_config["scenario"]

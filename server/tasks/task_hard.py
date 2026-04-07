@@ -4,6 +4,6 @@ def get_hard_task():
         "name": "incident-commander",
         "scenario": "incident-commander",
         "difficulty": "hard",
-        "max_steps": 30,
+        "max_steps": 25,
         "description": "Full cascading failure - diagnose and resolve a memory leak in auth-service."
     }
