@@ -25,7 +25,7 @@ class TaskEasyGrader(BaseGrader):
         
         outcome = "Correct diagnosis" if diagnosis_score >= 0.4 else "Failed to identify root cause"
         return {
-            "value": float(max(0.0, min(1.0, total))),
+            "value": float(max(0.01, min(0.99, total))),
             "breakdown": {"diagnosis": diagnosis_score, "speed": speed_bonus, "postmortem_penalty": postmortem_penalty},
             "reason": f"{outcome}: Identified {ground_truth['root_cause_service']} ({diagnosis_score:.1f})."
         }
@@ -59,7 +59,7 @@ class TaskMediumGrader(BaseGrader):
         
         total = rollback_score + commit_score + hypothesis_score + efficiency - penalty
         return {
-            "value": float(max(0.0, min(1.0, total))),
+            "value": float(max(0.01, min(0.99, total))),
             "breakdown": {
                 "rollback": rollback_score, 
                 "commit": commit_score, 
@@ -111,7 +111,7 @@ class TaskHardGrader(BaseGrader):
                  blast_radius_bonus + time_bonus - destructive_penalty)
                  
         return {
-            "value": float(max(0.0, min(1.0, total))),
+            "value": float(max(0.01, min(0.99, total))),
             "breakdown": {
                 "root_service": root_service_score, 
                 "action": action_score, 

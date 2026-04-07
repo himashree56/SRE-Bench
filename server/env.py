@@ -100,7 +100,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
 
         if self._done:
             self.observation.done = True
-            self.observation.reward = 0.0
+            self.observation.reward = 0.01
             return self.observation
 
         self.observation.step += 1
@@ -122,7 +122,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
         self.history.append({
             "step": self.observation.step,
             "action": action.model_dump(exclude={"metadata"}),
-            "reward": 0.0,  # Placeholder, updated below if needed
+            "reward": 0.01,  # Placeholder, updated below if needed
             "observation": self.observation.model_copy(deep=True),
         })
 
@@ -313,7 +313,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
             step_reward += grade_res["value"]
             breakdown.update(grade_res["breakdown"])
             return SREReward(
-                value=step_reward,
+                value=max(0.01, min(0.99, step_reward)),
                 breakdown=breakdown,
                 reason=grade_res["reason"],
             )
@@ -355,7 +355,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
                 step_reward -= 0.30
                 breakdown["destructive_penalty"] = -0.30
 
-        return SREReward(value=max(0.0, step_reward), breakdown=breakdown)
+        return SREReward(value=max(0.01, min(0.99, step_reward)), breakdown=breakdown)
 
     def _get_grader(self):
         sc = self.task_config["scenario"]
