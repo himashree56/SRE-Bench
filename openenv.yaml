@@ -21,7 +21,7 @@ tasks:
     description: "Full cascading failure - diagnose and resolve a memory leak in auth-service."
 action_space: tool_call
 observation_space: structured_json
-reward_range: [0.01, 0.99]
+reward_range: [0.001, 0.999]
 endpoints:
   reset: POST /reset
   step:  POST /step

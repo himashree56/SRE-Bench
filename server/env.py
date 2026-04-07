@@ -313,7 +313,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
             step_reward += grade_res["value"]
             breakdown.update(grade_res["breakdown"])
             return SREReward(
-                value=max(0.01, min(0.99, step_reward)),
+                value=max(0.001, min(0.999, step_reward)),
                 breakdown=breakdown,
                 reason=grade_res["reason"],
             )
@@ -355,7 +355,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
                 step_reward -= 0.30
                 breakdown["destructive_penalty"] = -0.30
 
-        return SREReward(value=max(0.01, min(0.99, step_reward)), breakdown=breakdown)
+        return SREReward(value=max(0.001, min(0.999, step_reward)), breakdown=breakdown)
 
     def _get_grader(self):
         sc = self.task_config["scenario"]
