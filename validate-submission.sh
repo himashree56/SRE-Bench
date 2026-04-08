@@ -197,7 +197,7 @@ else
   fail "openenv validate failed"
   printf "%s\n" "$VALIDATE_OUTPUT"
   hint "Common causes: tasks use 'name:' instead of 'id:' in openenv.yaml"
-  hint "Check reward_range covers negative values: [-0.5, 1.0]"
+  hint "Check reward_range is [0.01, 0.99] to ensure scores strictly between 0 and 1"
   hint "Verify all 3 endpoints (reset/step/state) respond correctly"
   stop_at "Step 4"
 fi

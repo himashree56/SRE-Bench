@@ -5,7 +5,7 @@ import os
 sys.path.append(os.getcwd())
 
 from server.graders import TaskEasyGrader, TaskMediumGrader, TaskHardGrader
-from server.scoring import MIN_TASK_SCORE, MAX_TASK_SCORE
+from server.scoring import MIN_FINAL_SCORE, MAX_FINAL_SCORE
 
 def test_easy_grader():
     grader = TaskEasyGrader()
@@ -19,7 +19,7 @@ def test_easy_grader():
         {"action": {"tool": "write_postmortem", "params": {}}}
     ]
     res_perfect = grader.score(history_perfect, ground_truth, {"status": "resolved"})
-    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_TASK_SCORE})")
+    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
     assert 0.1 < res_perfect['value'] < 1.0
 
     # Wrong service (Failure)
@@ -27,7 +27,7 @@ def test_easy_grader():
         {"action": {"tool": "set_hypothesis", "params": {"hypothesis": "payment-service is P1"}}}
     ]
     res_wrong = grader.score(history_wrong, ground_truth, {"status": "resolved"})
-    print(f"Test Wrong: {res_wrong['value']} (Expected: strictly between 0.1 and {MAX_TASK_SCORE})")
+    print(f"Test Wrong: {res_wrong['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
     assert 0.1 < res_wrong['value'] < 1.0
     
     # Partial success
@@ -35,7 +35,7 @@ def test_easy_grader():
         {"action": {"tool": "set_hypothesis", "params": {"hypothesis": "auth-service is fine"}}}
     ]
     res_partial = grader.score(history_partial, ground_truth, {"status": "resolved"})
-    print(f"Test Partial: {res_partial['value']} (Expected: strictly between 0.1 and {MAX_TASK_SCORE})")
+    print(f"Test Partial: {res_partial['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
     assert 0.1 < res_partial['value'] < 1.0
 
     print("TaskEasyGrader tests passed!")
@@ -52,16 +52,16 @@ def test_medium_grader():
         {"action": {"tool": "set_hypothesis", "params": {"hypothesis": "db-proxy commit badc0de caused latency"}}}
     ]
     res_perfect = grader.score(history_perfect, ground_truth, {"status": "resolved"})
-    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_TASK_SCORE})")
+    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
     assert 0.1 < res_perfect['value'] < 1.0
     
-    # Wrong service rollback
+    # Wrong service rollback (score gets clamped to MIN_FINAL_SCORE due to penalty)
     history_wrong = [
         {"action": {"tool": "rollback_deploy", "params": {"service": "auth-service", "to_commit": "abc123"}}}
     ]
     res_wrong = grader.score(history_wrong, ground_truth, {"status": "resolved"})
-    print(f"Test Wrong: {res_wrong['value']} (Expected: between 0.1 and {MAX_TASK_SCORE})")
-    assert 0.1 <= res_wrong['value'] < 1.0
+    print(f"Test Wrong: {res_wrong['value']} (Expected: strictly between 0 and 1, clamped to MIN_FINAL_SCORE={MIN_FINAL_SCORE})")
+    assert 0.0 < res_wrong['value'] < 1.0
 
     print("TaskMediumGrader tests passed!")
 
@@ -82,7 +82,7 @@ def test_hard_grader():
         }}}
     ]
     res_perfect = grader.score(history_perfect, ground_truth, {"status": "resolved"})
-    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_TASK_SCORE})")
+    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
     assert 0.1 < res_perfect['value'] < 1.0
     
     # No action taken
@@ -90,7 +90,7 @@ def test_hard_grader():
         {"action": {"tool": "list_alerts", "params": {}}}
     ]
     res_empty = grader.score(history_empty, ground_truth, {"status": "open"})
-    print(f"Test Empty: {res_empty['value']} (Expected: strictly between 0.1 and {MAX_TASK_SCORE})")
+    print(f"Test Empty: {res_empty['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
     assert 0.1 < res_empty['value'] < 1.0
 
     print("TaskHardGrader tests passed!")
@@ -121,7 +121,7 @@ def test_all_scores_strictly_between_0_and_1():
         result = grader.score(history, gt, {"status": "resolved"})
         score = result['value']
         assert 0.0 < score < 1.0, f"Score {score} is NOT strictly between 0 and 1!"
-        assert 0.1 <= score <= MAX_TASK_SCORE, f"Score {score} is outside expected range [0.1, {MAX_TASK_SCORE}]"
+        assert MIN_FINAL_SCORE <= score < 1.0, f"Score {score} is outside expected range [{MIN_FINAL_SCORE}, 1.0)"
         print(f"  Score: {score:.4f} - OK (strictly in (0, 1))")
     
     print("All scores verified: strictly between 0 and 1!")
