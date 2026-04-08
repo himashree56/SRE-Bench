@@ -101,7 +101,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
 
         if self._done:
             self.observation.done = True
-            self.observation.reward = clamp_task_score(0.01)
+            self.observation.reward = clamp_task_score(0.1)
             return self.observation
 
         self.observation.step += 1
@@ -123,7 +123,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
         self.history.append({
             "step": self.observation.step,
             "action": action.model_dump(exclude={"metadata"}),
-            "reward": clamp_task_score(0.01),  # Placeholder, updated below if needed
+            "reward": clamp_task_score(0.1),  # Placeholder, updated below if needed
             "observation": self.observation.model_copy(deep=True),
         })
 
