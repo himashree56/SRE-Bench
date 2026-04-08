@@ -7,7 +7,7 @@ from openenv.core.env_server.interfaces import Environment
 from server.models import SREObservation, SREAction, SREReward, SREState
 from server.simulator import SyntheticIncidentSimulator
 from server.graders import TaskEasyGrader, TaskMediumGrader, TaskHardGrader
-from server.scoring import clamp_task_score
+from server.scoring import clamp_task_score, MIN_FINAL_SCORE
 from server.tasks.task_easy import get_easy_task
 from server.tasks.task_medium import get_medium_task
 from server.tasks.task_hard import get_hard_task
@@ -101,7 +101,11 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
 
         if self._done:
             self.observation.done = True
+<<<<<<< Updated upstream
             self.observation.reward = clamp_task_score(0.1)
+=======
+            self.observation.reward = 0.0
+>>>>>>> Stashed changes
             return self.observation
 
         self.observation.step += 1
@@ -319,44 +323,19 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
                 reason=grade_res["reason"],
             )
 
-        # 2. Time-decay
-        step_reward -= 0.01
-        breakdown["time_decay"] = -0.01
-
-        # 3. Exploration vs toxic loop
+        # 2. Intermediate results (Sparse Model: Return 0.0)
+        # We still compute the breakdown for internal tracking/logging, 
+        # but the actual reward value returned is 0.0.
+        
+        # Track duplicate calls for metadata/logging
         call_sig = f"{action.tool}:{json.dumps(action.params, sort_keys=True)}"
         is_duplicate = call_sig in self.call_signatures
         self.call_signatures.add(call_sig)
 
-        if action.tool in [
-            "query_logs",
-            "get_metrics",
-            "list_alerts",
-            "get_deployment_history",
-            "query_runbook",
-        ]:
-            if is_duplicate:
-                step_reward -= 0.05
-                breakdown["loop_penalty"] = -0.05
-            else:
-                step_reward += 0.01
-                breakdown["exploration"] = 0.01
-                # DIAGNOSTIC BONUS
-                target_svc = self.scenario["ground_truth"].get("root_cause_service")
-                if action.params.get("service") == target_svc:
-                    step_reward += 0.05
-                    breakdown["diagnostic_bonus"] = 0.05
-
-        # 4. Destructive action penalty
-        if action.tool in ["rollback_deploy", "restart_service"]:
-            if (
-                action.params.get("service")
-                != self.scenario["ground_truth"].get("root_cause_service")
-            ):
-                step_reward -= 0.30
-                breakdown["destructive_penalty"] = -0.30
-
-        return SREReward(value=clamp_task_score(step_reward), breakdown=breakdown)
+        if is_duplicate:
+            breakdown["loop_penalty"] = -0.05
+        
+        return SREReward(value=0.0, breakdown=breakdown)
 
     def _get_grader(self):
         sc = self.task_config["scenario"]
