@@ -4,7 +4,7 @@ import os
 sys.path.append(os.getcwd())
 
 from server.graders import TaskEasyGrader, TaskMediumGrader, TaskHardGrader
-from server.scoring import MIN_TASK_SCORE, MAX_TASK_SCORE
+from server.scoring import MIN_FINAL_SCORE, MAX_FINAL_SCORE
 
 def test_easy_task():
     grader = TaskEasyGrader()
@@ -280,8 +280,8 @@ def main():
     print("\n" + "=" * 60)
     print("  SRE-BENCH GRADER COMPREHENSIVE TESTS")
     print("=" * 60)
-    print(f"MIN_TASK_SCORE: {MIN_TASK_SCORE}")
-    print(f"MAX_TASK_SCORE: {MAX_TASK_SCORE}")
+    print(f"MIN_FINAL_SCORE: {MIN_FINAL_SCORE}")
+    print(f"MAX_FINAL_SCORE: {MAX_FINAL_SCORE}")
     print()
     
     results = []
