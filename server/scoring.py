@@ -1,3 +1,4 @@
+import math
 from typing import Final
 
 MIN_FINAL_SCORE: Final[float] = 0.01
@@ -11,6 +12,14 @@ def clamp_task_score(score: float) -> float:
     For intermediate steps, a reward of 0.0 should be returned if using
     a sparse reward model.
     """
+    # Handle non-finite values (NaN, Inf)
+    if not isinstance(score, (int, float)) or not math.isfinite(float(score)):
+        return MIN_FINAL_SCORE
+    score = float(score)
     if score != score:  # NaN guard
         return MIN_FINAL_SCORE
-    return float(min(MAX_FINAL_SCORE, max(MIN_FINAL_SCORE, score)))
+    if score < MIN_FINAL_SCORE:
+        return MIN_FINAL_SCORE
+    if score > MAX_FINAL_SCORE:
+        return MAX_FINAL_SCORE
+    return score

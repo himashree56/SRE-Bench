@@ -19,24 +19,24 @@ def test_easy_grader():
         {"action": {"tool": "write_postmortem", "params": {}}}
     ]
     res_perfect = grader.score(history_perfect, ground_truth, {"status": "resolved"})
-    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
-    assert 0.1 < res_perfect['value'] < 1.0
+    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between {MIN_FINAL_SCORE} and {MAX_FINAL_SCORE})")
+    assert MIN_FINAL_SCORE < res_perfect['value'] < 1.0
 
     # Wrong service (Failure)
     history_wrong = [
         {"action": {"tool": "set_hypothesis", "params": {"hypothesis": "payment-service is P1"}}}
     ]
     res_wrong = grader.score(history_wrong, ground_truth, {"status": "resolved"})
-    print(f"Test Wrong: {res_wrong['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
-    assert 0.1 < res_wrong['value'] < 1.0
+    print(f"Test Wrong: {res_wrong['value']} (Expected: strictly between {MIN_FINAL_SCORE} and {MAX_FINAL_SCORE})")
+    assert MIN_FINAL_SCORE < res_wrong['value'] < 1.0
     
     # Partial success
     history_partial = [
         {"action": {"tool": "set_hypothesis", "params": {"hypothesis": "auth-service is fine"}}}
     ]
     res_partial = grader.score(history_partial, ground_truth, {"status": "resolved"})
-    print(f"Test Partial: {res_partial['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
-    assert 0.1 < res_partial['value'] < 1.0
+    print(f"Test Partial: {res_partial['value']} (Expected: strictly between {MIN_FINAL_SCORE} and {MAX_FINAL_SCORE})")
+    assert MIN_FINAL_SCORE < res_partial['value'] < 1.0
 
     print("TaskEasyGrader tests passed!")
 
@@ -52,8 +52,8 @@ def test_medium_grader():
         {"action": {"tool": "set_hypothesis", "params": {"hypothesis": "db-proxy commit badc0de caused latency"}}}
     ]
     res_perfect = grader.score(history_perfect, ground_truth, {"status": "resolved"})
-    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between 0.1 and {MAX_FINAL_SCORE})")
-    assert 0.1 < res_perfect['value'] < 1.0
+    print(f"Test Perfect: {res_perfect['value']} (Expected: strictly between {MIN_FINAL_SCORE} and {MAX_FINAL_SCORE})")
+    assert MIN_FINAL_SCORE < res_perfect['value'] < 1.0
     
     # Wrong service rollback (score gets clamped to MIN_FINAL_SCORE due to penalty)
     history_wrong = [
