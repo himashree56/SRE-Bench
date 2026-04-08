@@ -101,11 +101,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
 
         if self._done:
             self.observation.done = True
-<<<<<<< Updated upstream
-            self.observation.reward = clamp_task_score(0.1)
-=======
             self.observation.reward = 0.0
->>>>>>> Stashed changes
             return self.observation
 
         self.observation.step += 1
@@ -127,7 +123,7 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
         self.history.append({
             "step": self.observation.step,
             "action": action.model_dump(exclude={"metadata"}),
-            "reward": clamp_task_score(0.1),  # Placeholder, updated below if needed
+            "reward": 0.0,  # Placeholder, updated below if needed
             "observation": self.observation.model_copy(deep=True),
         })
 
@@ -346,4 +342,3 @@ class SREBenchEnv(Environment[SREAction, SREObservation, SREState]):
         if sc == "incident-commander":
             return TaskHardGrader()
         raise ValueError(f"No grader mapped for scenario: {sc}")
-
