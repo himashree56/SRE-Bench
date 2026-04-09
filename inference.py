@@ -95,9 +95,10 @@ def log_step(step, action, reward, done, error):
     print(f"[STEP] step={step} action={action} reward={reward:.2f} "
           f"done={str(done).lower()} error={err}", flush=True)
 
-def log_end(success, steps, rewards):
-    r = ",".join(f"{x:.2f}" for x in rewards)
-    print(f"[END] success={str(success).lower()} steps={steps} rewards={r}", flush=True)
+def log_end(task, success, steps, rewards):
+    raw_score = rewards[-1] if rewards else 0.0
+    final_score = max(0.01, min(0.99, float(raw_score)))
+    print(f"[END] task={task} score={final_score:.2f} steps={steps}", flush=True)
 
 def get_agent_action(llm_client: OpenAI, obs: Dict[str, Any], history: List[Dict[str, Any]], task: str, max_retries: int = 3) -> Dict[str, Any]:
     """Interacts with the LLM to get the next SREAction with a retry loop."""
@@ -207,7 +208,7 @@ async def run_task(task: str):
         print(f"[ERROR] Task execution failed: {e}", flush=True)
         success = False
     finally:
-        log_end(success, steps_taken, rewards)
+        log_end(task, success, steps_taken, rewards)
 
 async def main():
     print(f"[DEBUG] Config: API={API_BASE_URL}, MODEL={MODEL_NAME}, KEY_PRESENT={bool(API_KEY)}", flush=True)
