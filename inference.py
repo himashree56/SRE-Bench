@@ -11,12 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Ensure SRE-bench and OpenEnv are in path
-_project_root = os.path.abspath(os.path.dirname(__file__))
-_repo = os.path.abspath(os.path.join(_project_root, "..", "OpenEnv"))
-for _p in [_project_root, _repo, os.path.join(_repo, "src")]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+
 
 from openenv.core.env_client import EnvClient
 from openenv.core.client_types import StepResult

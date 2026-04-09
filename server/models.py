@@ -1,8 +1,4 @@
-import sys, os as _os
-_repo = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), '..', '..', 'OpenEnv'))
-for _p in [_repo, _os.path.join(_repo, 'src')]:
-    if _p not in sys.path:
-        sys.path.insert(0, _p)
+
 
 from pydantic import Field
 from typing import List, Optional, Dict, Any, Literal
