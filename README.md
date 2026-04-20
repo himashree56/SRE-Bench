@@ -52,7 +52,7 @@ Each task has a deterministic grader scoring strictly between **0 and 1** only.
 Ensure these are set for `inference.py`:
 - `API_BASE_URL`: LLM API base URL.
 - `MODEL_NAME`: LLM model name.
-- `HF_TOKEN`: Hugging Face token (or API key).
+- `API KEY`: API key.
 
 ### Local Development
 1. `pip install -r requirements.txt`
