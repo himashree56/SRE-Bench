@@ -1,5 +1,3 @@
-# SREBench Fix: Resolve HF Space /reset 404
-
 ## Plan Steps:
 - [x] 1. Understand codebase and identify issue (local OpenEnv sys.path breaks in HF Space).
 - [x] 2. Edit server/app.py: Remove sys.path inserts for ../OpenEnv.
