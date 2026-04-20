@@ -37,7 +37,7 @@ Available tools: `list_alerts`, `query_logs`, `get_metrics`, `get_deployment_his
 | **root-cause-correlator**| Medium | 15 | Diagnose a bad deploy on `db-proxy` causing latency on `payment-service`. |
 | **incident-commander** | Hard | 25 | Diagnose and resolve a memory leak in `auth-service` causing cascading failure. |
 
-Each task has a deterministic grader scoring strictly between **0 and 1**.
+Each task has a deterministic grader scoring strictly between **0 and 1** only.
 
 ## Baseline Scores
 | Model | alert-classifier | root-cause-correlator | incident-commander |
