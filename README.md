@@ -44,7 +44,7 @@ Each task has a deterministic grader scoring strictly between **0 and 1**.
 | :--- | :---: | :---: | :---: |
 | Qwen/Qwen2.5-72B-Instruct | 0.85 | 0.72 | 0.61 |
 | GPT-4o-2024-05-13 | 0.91 | 0.84 | 0.78 |
-| Human SRE | 1.00 | 1.00 | 0.95 |
+| Human SRE | 0.99 | 0.99 | 0.95 |
 
 ## Setup & Usage
 
